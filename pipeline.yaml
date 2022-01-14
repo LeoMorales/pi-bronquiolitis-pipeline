@@ -1,0 +1,33 @@
+tasks:
+  # Process:
+  - source: tasks.raw.get
+    product: _products/raw/points.csv
+
+  - source: tasks.raw.get_hc
+    product: _products/raw/get_hc.csv
+
+  - source: tasks.raw.shape
+    product: _products/raw/shape.parquet
+
+  # Figures:
+  - source: tasks.cluster.get_cluster
+    name: cluster
+    product: _products/cluster/cluster_map.png
+
+  - source: tasks.cluster.get_cluster_bv
+    name: cluster_bv
+    product: _products/cluster/cluster_bv_map.png
+
+  - source: tasks.moran.get_moran
+    name: moran
+    product: _products/moran/moran.png
+
+  - source: tasks.moran.get_moran_bv
+    name: moran_bv
+    product: _products/moran/moran_bv.png
+
+  # Report:
+  - source: scripts/cluster_report.py
+    product:
+      nb: _output/cluster_report.ipynb
+      data: _output/cluster_report.pdf
