@@ -1,0 +1,5 @@
+pysal
+splot
+geopandas
+pdfkit
+ploomber
