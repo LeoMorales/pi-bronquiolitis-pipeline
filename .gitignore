@@ -17,3 +17,5 @@ _products/
 
 # cache files
 */__pycache__/*
+
+input-data/

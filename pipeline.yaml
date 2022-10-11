@@ -1,10 +1,13 @@
 tasks:
   # Process:
-  - source: tasks.raw.get
-    product: _products/raw/points.csv
+  - source: tasks.raw.get_bronchiolitis
+    params:
+      MEDICAL_RECORDS_CSV_PATH: '{{bronchiolitis_cases_file_path}}' 
+      ADRESSES_AND_LATLONG_CSV_PATH: '{{adresses_file_path}}' 
+    product: _products/raw/bronchiolitis_points.csv
 
-  - source: tasks.raw.get_hc
-    product: _products/raw/get_hc.csv
+  #- source: tasks.raw.get_hc
+  #  product: _products/raw/get_hc.csv
 
   - source: tasks.raw.shape
     product: _products/raw/shape.parquet
@@ -12,10 +15,16 @@ tasks:
   # Figures:
   - source: tasks.cluster.get_cluster
     name: cluster
+    params:
+      PUERTO_MADRYN_BASEMAP_TIF_PATH: '{{puerto_madryn_basemap_file}}' 
+      SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{south_america_basemap_file}}' 
     product: _products/cluster/cluster_map.png
 
   - source: tasks.cluster.get_cluster_bv
     name: cluster_bv
+    params:
+      PUERTO_MADRYN_BASEMAP_TIF_PATH: '{{puerto_madryn_basemap_file}}' 
+      SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{south_america_basemap_file}}' 
     product: _products/cluster/cluster_bv_map.png
 
   - source: tasks.moran.get_moran
