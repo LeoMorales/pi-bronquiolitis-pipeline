@@ -145,3 +145,5 @@ def shape(product):
     
     # pm_tracts.to_file(product, driver="GeoJSON")
     pm_tracts.to_parquet(product, index=False)
+
+

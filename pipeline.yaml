@@ -6,11 +6,13 @@ tasks:
       ADRESSES_AND_LATLONG_CSV_PATH: '{{adresses_file_path}}' 
     product: _products/raw/bronchiolitis_points.csv
 
-  #- source: tasks.raw.get_hc
-  #  product: _products/raw/get_hc.csv
-
   - source: tasks.raw.shape
     product: _products/raw/shape.parquet
+
+  - source: tasks.cases.get_cases
+    params:
+      PUERTO_MADRYN_SHAPEFILE_PATH: '{{puerto_madryn_shapefile}}' 
+    product: _products/cases/bronchiolitis_in_topo.parquet
 
   # Figures:
   - source: tasks.cluster.get_cluster
