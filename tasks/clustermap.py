@@ -208,12 +208,8 @@ def get_cluster_figure(
     upstream = ['get_bronchiolitis', 'shape']
     '''
     # Casos (puntos)
-    shape = geopandas.read_parquet(str(upstream['get_moranplot_and_save_tags']['cluster_labels']))
+    shape = geopandas.read_parquet(str(upstream['get_moranplot']['cluster_labels']))
     
-    bronchiolitis_points_gdf = geopandas.read_parquet(upstream['get_bronchiolitis_locations'])
-    bronchiolitis_points_gdf = bronchiolitis_points_gdf.to_crs(shape.crs.to_string())
-
-
     # Figura
     tracts_palette, edge_palette = __get_colors(
         shape.label,
@@ -233,6 +229,8 @@ def get_cluster_figure(
     # admission and readmissions points
     pmarks_points = []
     if PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP:
+        bronchiolitis_points_gdf = geopandas.read_parquet(upstream['get_bronchiolitis_locations'])
+        bronchiolitis_points_gdf = bronchiolitis_points_gdf.to_crs(shape.crs.to_string())
         admissions_gdf = bronchiolitis_points_gdf[~bronchiolitis_points_gdf.es_reinternacion]
         readmissions_gdf = bronchiolitis_points_gdf[bronchiolitis_points_gdf.es_reinternacion]
         ax, pmarks_points = __add_admission_points(admissions_gdf, readmissions_gdf, ax)
@@ -276,16 +274,14 @@ def get_cluster_figure_bv(
     upstream = ['get_bronchiolitis', 'shape']
     '''
     # # Capa (+ casos)
-    shape = geopandas.read_parquet(str(upstream['get_moranplot_and_save_tags']['cluster_labels']))
-    bronchiolitis_points_gdf = geopandas.read_parquet(str(upstream['get_bronchiolitis_locations']))
-    bronchiolitis_points_gdf = bronchiolitis_points_gdf.to_crs(shape.crs.to_string())
+    shape = geopandas.read_parquet(str(upstream['get_moranplot_bv']['cluster_labels']))
 
     # # Figura
     tracts_palette, edge_palette = __get_colors(
         shape.label,
         list(LABEL_BY_QUADFILTER_DICT.values()))
 
-    ax, pmarks_map = __create_map(shape, "label_bv", tracts_palette, edge_palette)
+    ax, pmarks_map = __create_map(shape, "label", tracts_palette, edge_palette)
 
     ax = __annotate_map(
         ax,
@@ -297,6 +293,9 @@ def get_cluster_figure_bv(
     # cases points
     pmarks_points = []
     if PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP:
+        bronchiolitis_points_gdf = geopandas.read_parquet(str(upstream['get_bronchiolitis_locations']))
+        bronchiolitis_points_gdf = bronchiolitis_points_gdf.to_crs(shape.crs.to_string())
+
         # admission and readmissions points
         admissions_gdf = bronchiolitis_points_gdf[~bronchiolitis_points_gdf.es_reinternacion]
         readmissions_gdf = bronchiolitis_points_gdf[bronchiolitis_points_gdf.es_reinternacion]

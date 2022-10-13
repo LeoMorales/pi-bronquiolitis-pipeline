@@ -87,7 +87,7 @@ def __get_colors_for_labels(labels, color_by_labels):
     return [color_by_labels[label_key] for label_key in actual_labels]
 
 
-def get_moranplot_and_save_tags(upstream, product, LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAME_DICT):
+def get_moranplot(upstream, product, LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAME_DICT):
     """ Ejecuta el analisis espacial y guarda dos salidas:
         - etiquetas de cluster para cada circuito electoral y
         - el moranplot + distribución de referencia. 
@@ -106,13 +106,6 @@ def get_moranplot_and_save_tags(upstream, product, LABEL_BY_QUADFILTER_DICT, COL
     """
     pm_tracts = geopandas.read_parquet(upstream["get_cases_for_each_circuit"])
     
-    # add nbi to shape:
-    tracts_with_nbi_gdf = geopandas.read_parquet(upstream["get_shape"])
-    pm_tracts = pandas.merge(
-        pm_tracts,
-        tracts_with_nbi_gdf[['toponimo_i', 'nbi']],
-        on='toponimo_i')
-
     # Pesos y geodataframes de trabajo
     weights, moran_rate, lisa_rate = \
         spatial.get_spatials(
@@ -131,27 +124,8 @@ def get_moranplot_and_save_tags(upstream, product, LABEL_BY_QUADFILTER_DICT, COL
     # add label column
     pm_tracts['label'] = labels
 
-    ####
-    # bivariate analysis:
-    weights_bv, moran_bv, lisa_bv = \
-        spatial.get_spatials(
-            pm_tracts,
-            attribute='nbi',
-            strategy='knn',
-            k_neighbours=6,
-            use_moran_bv=True,
-            moran_bv_column='tasa_casos'
-        )
-    
-    # contar las cantidades por cada cluster
-    quadfilter_bv = (lisa_bv.p_sim <= (.05)) * (lisa_bv.q)
-    labels_bv = [LABEL_BY_QUADFILTER_DICT[str(i)] for i in quadfilter_bv]
-    # add label column:
-    pm_tracts['label_bv'] = labels_bv
-
     ordered_cols = [
-        'toponimo_i', 'casos', 'totalpobl', 'tasa_casos',
-        'nbi', 'label', 'label_bv', 'geometry'
+        'toponimo_i', 'label', 'geometry'
     ]
     pm_tracts = pm_tracts[ordered_cols]
     pm_tracts.to_parquet(
@@ -173,6 +147,45 @@ def get_moranplot_and_save_tags(upstream, product, LABEL_BY_QUADFILTER_DICT, COL
         label_colors=label_colors,
         annotations=annotations
     )
+
+
+
+def get_moranplot_bv(upstream, product, LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAME_DICT):
+    """
+    """
+    pm_tracts = geopandas.read_parquet(upstream["get_cases_for_each_circuit"])
+    
+    # add nbi to shape:
+    nbi_df = pandas.read_parquet(upstream["get_nbi"])
+    pm_tracts = pandas.merge(
+        pm_tracts,
+        nbi_df,
+        on='toponimo_i')
+
+    ####
+    # bivariate analysis:
+    weights_bv, moran_bv, lisa_bv = \
+        spatial.get_spatials(
+            pm_tracts,
+            attribute='nbi',
+            strategy='knn',
+            k_neighbours=6,
+            use_moran_bv=True,
+            moran_bv_column='tasa_casos'
+        )
+    
+    # contar las cantidades por cada cluster
+    quadfilter_bv = (lisa_bv.p_sim <= (.05)) * (lisa_bv.q)
+    labels_bv = [LABEL_BY_QUADFILTER_DICT[str(i)] for i in quadfilter_bv]
+    # add label column:
+    pm_tracts['label'] = labels_bv
+
+    ordered_cols = ['toponimo_i', 'label', 'geometry']
+    pm_tracts = pm_tracts[ordered_cols]
+    pm_tracts.to_parquet(
+        str(product['cluster_labels']),
+        index=False
+    )
     
     annotations_bv = [
         {'text': "HH", 'x_pos': 3.5, 'y_pos': 1.5},
@@ -183,7 +196,7 @@ def get_moranplot_and_save_tags(upstream, product, LABEL_BY_QUADFILTER_DICT, COL
     label_colors_bv = __get_colors_for_labels(labels_bv, COLOR_BY_LABELNAME_DICT)
     _get_moran_plot(
         moran_bv, lisa_bv,
-        str(product['moranplot_bv']),
+        str(product['moranplot']),
         xlabel='UBN',
         ylabel='Spatial lag: Bronchiolitis case rate',
         label_colors=label_colors_bv,

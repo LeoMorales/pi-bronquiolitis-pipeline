@@ -125,3 +125,19 @@ def get_shape(product, PUERTO_MADRYN_SHAPEFILE_PATH):
     pm_tracts.to_parquet(product, index=False)
 
 
+def get_nbi(product, PUERTO_MADRYN_SHAPEFILE_PATH):
+    """
+    Devuelve el valor de nbi para cada circuito (por toponimo)
+    
+    """
+    pm_tracts = geopandas.read_file(PUERTO_MADRYN_SHAPEFILE_PATH)
+    
+    pm_tracts['toponimo_i'] = pm_tracts["toponimo_i"].astype('string')
+    pm_tracts = pm_tracts.rename(columns={'Unidades_7': 'nbi'})
+    
+    columns = ['toponimo_i', 'nbi']
+    pm_tracts = pm_tracts[columns]
+    
+    pm_tracts.to_parquet(product, index=False)
+
+

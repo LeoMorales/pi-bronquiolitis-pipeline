@@ -9,7 +9,7 @@ import os
 import pdfkit
 
 # + tags=["parameters"]
-upstream = ['clustermap_figure', 'clustermap_figure_bv', 'get_moranplot_and_save_tags']
+upstream = ['clustermap_figure', 'clustermap_figure_bv', 'get_moranplot', 'get_moranplot_bv']
 product = None
 # -
 # # Reporte
@@ -18,8 +18,8 @@ product = None
 # HTML template to add our data and plots
 figure_clusters_path = str(upstream['clustermap_figure'])
 figure_clusters_bv_path = str(upstream['clustermap_figure_bv'])
-figure_moran_path = str(upstream['get_moranplot_and_save_tags']['moranplot'])
-figure_moran_bv_path = str(upstream['get_moranplot_and_save_tags']['moranplot_bv'])
+figure_moran_path = str(upstream['get_moranplot']['moranplot'])
+figure_moran_bv_path = str(upstream['get_moranplot_bv']['moranplot'])
 
 report_template = f'''
 <!DOCTYPE html>
