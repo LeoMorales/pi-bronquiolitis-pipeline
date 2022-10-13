@@ -32,6 +32,7 @@ tasks:
       PUERTO_MADRYN_BASEMAP_TIF_PATH: '{{puerto_madryn_basemap_file}}' 
       SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{south_america_basemap_file}}'
       LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
+      PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP: '{{paint_bronchiolitis_locations_in_map}}'
     product: _products/cluster/cluster_map.png
 
   - source: tasks.clustermap.get_cluster_figure_bv
@@ -40,6 +41,7 @@ tasks:
       PUERTO_MADRYN_BASEMAP_TIF_PATH: '{{puerto_madryn_basemap_file}}' 
       SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{south_america_basemap_file}}' 
       LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
+      PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP: '{{paint_bronchiolitis_locations_in_map}}'      
     product: _products/cluster/cluster_bv_map.png
 
   # Report:

@@ -200,7 +200,9 @@ def get_cluster_figure(
         product, upstream,
         PUERTO_MADRYN_BASEMAP_TIF_PATH,
         SOUTH_AMERICA_BASEMAP_TIF_PATH,
-        LABEL_BY_QUADFILTER_DICT):
+        LABEL_BY_QUADFILTER_DICT,
+        PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP
+    ):
     ''' Genera la figura de HS, CS, y outliers + puntos de domicilios de las internaciones.
     
     upstream = ['get_bronchiolitis', 'shape']
@@ -229,10 +231,11 @@ def get_cluster_figure(
     )
     
     # admission and readmissions points
-    admissions_gdf = bronchiolitis_points_gdf[~bronchiolitis_points_gdf.es_reinternacion]
-    readmissions_gdf = bronchiolitis_points_gdf[bronchiolitis_points_gdf.es_reinternacion]
-    ax, pmarks_points = __add_admission_points(admissions_gdf, readmissions_gdf, ax)
-    
+    pmarks_points = []
+    if PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP:
+        admissions_gdf = bronchiolitis_points_gdf[~bronchiolitis_points_gdf.es_reinternacion]
+        readmissions_gdf = bronchiolitis_points_gdf[bronchiolitis_points_gdf.es_reinternacion]
+        ax, pmarks_points = __add_admission_points(admissions_gdf, readmissions_gdf, ax)
 
     # legend
     pmarks = [*pmarks_map, *pmarks_points]
@@ -264,7 +267,9 @@ def get_cluster_figure_bv(
         product, upstream,
         PUERTO_MADRYN_BASEMAP_TIF_PATH,
         SOUTH_AMERICA_BASEMAP_TIF_PATH,
-        LABEL_BY_QUADFILTER_DICT):
+        LABEL_BY_QUADFILTER_DICT,
+        PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP
+    ):
     ''' Genera la figura de HS, CS, y outliers + puntos de domicilios de las internaciones.
     Utiliza los moran locales bivariados
     
@@ -290,10 +295,12 @@ def get_cluster_figure_bv(
     )
 
     # cases points
-    # admission and readmissions points
-    admissions_gdf = bronchiolitis_points_gdf[~bronchiolitis_points_gdf.es_reinternacion]
-    readmissions_gdf = bronchiolitis_points_gdf[bronchiolitis_points_gdf.es_reinternacion]
-    ax, pmarks_points = __add_admission_points(admissions_gdf, readmissions_gdf, ax)
+    pmarks_points = []
+    if PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP:
+        # admission and readmissions points
+        admissions_gdf = bronchiolitis_points_gdf[~bronchiolitis_points_gdf.es_reinternacion]
+        readmissions_gdf = bronchiolitis_points_gdf[bronchiolitis_points_gdf.es_reinternacion]
+        ax, pmarks_points = __add_admission_points(admissions_gdf, readmissions_gdf, ax)
 
     
     # legend
