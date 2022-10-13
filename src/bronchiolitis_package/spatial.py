@@ -179,11 +179,6 @@ def plot_lisa_map(
     return f, ax
 
 
-
-
-
-
-
 def plot_hot_cold_and_outliers(
     moran_local, shape_vis,
     ax=None,
@@ -248,8 +243,6 @@ def plot_hot_cold_and_outliers(
         ax.xaxis.tick_top()
     ax.set_axis_off()
     return ax
-
-    
 
 
 def plot_moran_significance(shape, moran_local, ax, bbox_to_anchor = (0., 0., 0.2, 1.)):

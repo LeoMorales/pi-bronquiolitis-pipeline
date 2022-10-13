@@ -9,21 +9,17 @@ import os
 import pdfkit
 
 # + tags=["parameters"]
-upstream = ['cluster', 'cluster_bv', 'moran', 'moran_bv']
+upstream = ['clustermap_figure', 'clustermap_figure_bv', 'get_moranplot_and_save_tags']
 product = None
 # -
-
-
-
-
 # # Reporte
 
 # +
 # HTML template to add our data and plots
-figure_clusters_path = str(upstream['cluster'])
-figure_clusters_bv_path = str(upstream['cluster_bv'])
-figure_moran_path = str(upstream['moran'])
-figure_moran_bv_path = str(upstream['moran_bv'])
+figure_clusters_path = str(upstream['clustermap_figure'])
+figure_clusters_bv_path = str(upstream['clustermap_figure_bv'])
+figure_moran_path = str(upstream['get_moranplot_and_save_tags']['moranplot'])
+figure_moran_bv_path = str(upstream['get_moranplot_and_save_tags']['moranplot_bv'])
 
 report_template = f'''
 <!DOCTYPE html>
@@ -48,14 +44,16 @@ report_template = f'''
           </style>                       
       </head>
       <h1 align="center">Reporte: Bronquiolitis</h1>
-      <h2 align="center">Tasa casos: Casos sobre cantidad de habitantes</h2>
+      <h2 align="left">Análisis: Tasa de casos sobre cantidad de habitantes</h2>
+      <h3 align="left">Estrategia KNN=6</h3>
       <figure>
         <img src="{figure_moran_path}" width="1000" height="400">
       </figure>
       <figure>
         <img src="{figure_clusters_path}" width="1000" height="900">
       </figure>
-      <h2 align="center">Análisis bi-variado: Tasa casos vs Lag espacial de NBI</h2>
+      <h2 align="left">Análisis bi-variado: NBI vs Lag espacial de Tasa Casos</h2>
+      <h3 align="left">Estrategia KNN=6</h3>
       <figure>
         <img src="{figure_moran_bv_path}" width="1000" height="400">
       </figure>

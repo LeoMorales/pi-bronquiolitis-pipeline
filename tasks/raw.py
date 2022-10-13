@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 import pandas
 import geopandas
-from bronchiolitis_package import spatial
-import esda
 
 
-def get_bronchiolitis(product, MEDICAL_RECORDS_CSV_PATH, ADRESSES_AND_LATLONG_CSV_PATH):
+def get_bronchiolitis_locations(product, MEDICAL_RECORDS_CSV_PATH, ADRESSES_AND_LATLONG_CSV_PATH):
     """
     Tarea que combina los datos crudos de casos de bronquiolitis con el dataset de domicilios.
     El dataset crudo tiene las siguientes columnas:
@@ -28,16 +26,20 @@ def get_bronchiolitis(product, MEDICAL_RECORDS_CSV_PATH, ADRESSES_AND_LATLONG_CS
     
     Returns:
     
-        CSV con las coordenadas de los casos recolectados.
+        geopandas.GeoDataframe:
+        Coordenadas de los casos recolectados.
         La columna es_reinternacion se obtiene según el atributo hc se encuentre duplicado o no.
 
-            hc      ingreso     egreso      se      edad    domicilio_definitivo        es_reinternacion    latitud     longitud
-        0   143367  2017-01-06  2017-01-09  1.0     0.63    Manuel Castro 1230          False               -42.759311  -65.055118
-        1   143597  2017-01-19  2017-01-21  3.0     0.70    Cholila 1311                False               -42.760486  -65.057645
-        2   144173  2017-02-22  2017-02-23  8.0     0.33    Luis Federico Leloir 820    False               -42.786004  -65.071097
-        3   144546  2017-03-27  2017-04-01  13.0    4.00    Mitre 41                    False               -42.765109  -65.037430
-        4   144189  2017-03-29  2017-04-01  13.0    1.00    El Hoyo 1310                False               -42.758420  -65.062481
-        """
+               hc     ingreso      egreso   se  edad      domicilio_definitivo  \
+        0  143367  2017-01-06  2017-01-09  1.0  0.63        Manuel Castro 1230   
+        1  143597  2017-01-19  2017-01-21  3.0  0.70              Cholila 1311   
+        2  144173  2017-02-22  2017-02-23  8.0  0.33  Luis Federico Leloir 820   
+
+           es_reinternacion    latitud   longitud                     geometry  
+        0             False -42.759311 -65.055118  POINT (-65.05512 -42.75931)  
+        1             False -42.760486 -65.057645  POINT (-65.05765 -42.76049)  
+        2             False -42.786004 -65.071097  POINT (-65.07110 -42.78600) 
+    """
     # A: Historias clínicas
     df_raw = pandas.read_csv(MEDICAL_RECORDS_CSV_PATH)
 
@@ -84,66 +86,42 @@ def get_bronchiolitis(product, MEDICAL_RECORDS_CSV_PATH, ADRESSES_AND_LATLONG_CS
         domicilio_latlong,
         on='domicilio_definitivo',
     )
-    output_df.to_csv(product, index=False)
+    
+    #
+    # D: Create geodataframe:
+    output_gdf = geopandas.GeoDataFrame(
+        output_df,
+        geometry=geopandas.points_from_xy(output_df.longitud, output_df.latitud),
+        crs="EPSG:4326"
+    )
+    
+    output_gdf.to_parquet(product, index=False)
 
-def shape(product):
+def get_shape(product, PUERTO_MADRYN_SHAPEFILE_PATH):
     """
     Limpia la capa y devuelve un parquet para leer con geopandas.
-    TODO: Realizar una tarea (paso) previa que incorpora la información a la capa.
-    Esto permitiria en el flujo trabajar separado datos de capa y combinar cuando resulte necesario.
+    
+    Returns:
+        
+        geopandas.GeoDataframe:
+                  toponimo_i       link  totalpobl   nbi  \
+            0     321973  260070401     1086.0  3.29   
+            1     321976  260070402      712.0  8.23   
+            2     319120  260070403      693.0  6.51   
+
+                                                        geometry  
+            0  POLYGON ((3578785.448 5264948.990, 3578901.180...  
+            1  POLYGON ((3578244.850 5265535.078, 3578270.165...  
+            2  POLYGON ((3578569.532 5266020.406, 3578696.315...  
     """
-    pm_tracts = \
-        geopandas.read_file(
-            '/home/lmorales/work/pi-bronquiolitis-pipeline/input/shapes/cases_per_census_tract.geojson'
-        )
+    pm_tracts = geopandas.read_file(PUERTO_MADRYN_SHAPEFILE_PATH)
     
     pm_tracts['toponimo_i'] = pm_tracts["toponimo_i"].astype('string')
     pm_tracts = pm_tracts.rename(columns={'Unidades_7': 'nbi'})
-    pm_tracts['tasa_casos'] = (pm_tracts.casos / pm_tracts.totalpobl) * 10_000
     
-    columns = ['toponimo_i', 'link', 'totalpobl', 'nbi', 'casos', 'geometry', 'tasa_casos']
+    columns = ['toponimo_i', 'link', 'totalpobl', 'nbi', 'geometry']
     pm_tracts = pm_tracts[columns]
     
-    # Pesos y geodataframes de trabajo
-    weights, moran_rate, lisa_rate = \
-        spatial.get_spatials(
-            pm_tracts,
-            attribute='casos',
-            strategy='knn',
-            k_neighbours=6,
-            use_moran_rate=True,
-            moran_rate_column='totalpobl'
-        )
-
-    # 1. Contar las cantidades por cada cluster
-    quadfilter = \
-            (lisa_rate.p_sim <= (.05)) * (lisa_rate.q)
-    spot_labels = ['Not significant', 'Hot spot', 'Donut', 'Cold spot', 'Diamond']
-    labels = [spot_labels[i] for i in quadfilter]
-    pm_tracts['label'] = labels
-    
-    # get lisa bivariate!:
-    #weights_queen, _, _ = \
-    #    spatial.get_spatials(
-    #        pm_tracts,
-    #        attribute='tasa_casos',
-    #        strategy='queen'
-    #    )
-
-    lisa_bv = esda.Moran_Local_BV(
-        pm_tracts['nbi'].values,
-        pm_tracts['tasa_casos'].values,
-        weights
-    )
-    # Contar las cantidades por cada cluster
-    quadfilter_bv = \
-            (lisa_bv.p_sim <= (.05)) * (lisa_bv.q)
-    labels_bv = [spot_labels[i] for i in quadfilter_bv]
-    pm_tracts['label_bv'] = labels_bv
-    
-    
-    
-    # pm_tracts.to_file(product, driver="GeoJSON")
     pm_tracts.to_parquet(product, index=False)
 
 

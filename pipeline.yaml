@@ -1,41 +1,46 @@
 tasks:
   # Process:
-  - source: tasks.raw.get_bronchiolitis
+  - source: tasks.raw.get_bronchiolitis_locations
     params:
       MEDICAL_RECORDS_CSV_PATH: '{{bronchiolitis_cases_file_path}}' 
       ADRESSES_AND_LATLONG_CSV_PATH: '{{adresses_file_path}}' 
-    product: _products/raw/bronchiolitis_points.csv
+    product: _products/raw/bronchiolitis_points.parquet
 
-  - source: tasks.raw.shape
-    product: _products/raw/shape.parquet
-
-  - source: tasks.cases.get_cases
+  - source: tasks.raw.get_shape
     params:
       PUERTO_MADRYN_SHAPEFILE_PATH: '{{puerto_madryn_shapefile}}' 
-    product: _products/cases/bronchiolitis_in_topo.parquet
+    product: _products/raw/pm_shape.parquet
+
+  - source: tasks.cases.get_cases_for_each_circuit
+    params:
+      PUERTO_MADRYN_SHAPEFILE_PATH: '{{puerto_madryn_shapefile}}' 
+    product: _products/cases/bronchiolitis_and_tracts.parquet
+
+  - source: tasks.spatial.get_moranplot_and_save_tags
+    params:
+      LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
+      COLOR_BY_LABELNAME_DICT: '{{color_by_labelname}}'
+    product:
+      cluster_labels: _products/spatial/cluster_labels.parquet
+      moranplot: _products/spatial/moranplot.png
+      moranplot_bv: _products/spatial/moranplot_bv.png
 
   # Figures:
-  - source: tasks.cluster.get_cluster
-    name: cluster
+  - source: tasks.clustermap.get_cluster_figure
+    name: clustermap_figure
     params:
       PUERTO_MADRYN_BASEMAP_TIF_PATH: '{{puerto_madryn_basemap_file}}' 
-      SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{south_america_basemap_file}}' 
+      SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{south_america_basemap_file}}'
+      LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
     product: _products/cluster/cluster_map.png
 
-  - source: tasks.cluster.get_cluster_bv
-    name: cluster_bv
+  - source: tasks.clustermap.get_cluster_figure_bv
+    name: clustermap_figure_bv
     params:
       PUERTO_MADRYN_BASEMAP_TIF_PATH: '{{puerto_madryn_basemap_file}}' 
       SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{south_america_basemap_file}}' 
+      LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
     product: _products/cluster/cluster_bv_map.png
-
-  - source: tasks.moran.get_moran
-    name: moran
-    product: _products/moran/moran.png
-
-  - source: tasks.moran.get_moran_bv
-    name: moran_bv
-    product: _products/moran/moran_bv.png
 
   # Report:
   - source: scripts/cluster_report.py
