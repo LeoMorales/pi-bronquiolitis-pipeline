@@ -113,7 +113,7 @@ def add_points_to_ax(point_gdf, ax, point_plot_args={}, label_title="Admissions"
                color='none',
                label=f'{label_title} ({len(point_gdf)})',
                markerfacecolor=point_plot_args['color'],
-               markersize=6,
+               markersize=(point_plot_args['markersize']/10) * (2 - (2*(point_plot_args['markersize']/10)/100)),
                alpha=point_plot_args['alpha'])
     )
 

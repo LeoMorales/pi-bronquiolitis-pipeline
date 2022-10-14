@@ -108,16 +108,16 @@ def get_nbi_map(upstream, product):
     point_plot_args = {
         "marker": 'o',
         "color": 'k',
-        "alpha": 0.5,
-        "markersize": 10
+        "alpha": 0.6,
+        "markersize": 15
     }
     ax, pmarks_admission_points = maps_utils.add_points_to_ax(
         admissions_gdf, ax, point_plot_args, label_title="Admissions")
 
     point_plot_args = {
         "marker": 'o',
-        "color": 'r',
-        "alpha": 0.25,
+        "color": '#3f007d',  # purple
+        "alpha": 0.5,
         "markersize": 50
     }
     ax, pmarks_readmission_points = maps_utils.add_points_to_ax(
@@ -131,7 +131,9 @@ def get_nbi_map(upstream, product):
         loc='upper right',
         prop={'size': 12}
     )
-    ax.set(title='Puerto Madryn NBI and bronchiolitis cases')
+    title = 'Distribution of bronchiolitis cases (2017) on census radios'
+    title += '\naccording to NBI 3 Overcrowding (2010) (in total %)'
+    ax.set_title(title, fontsize=18)
     ax.axis('off')
     
     plt.tight_layout()
