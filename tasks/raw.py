@@ -115,13 +115,9 @@ def get_shape(product, PUERTO_MADRYN_SHAPEFILE_PATH):
             2  POLYGON ((3578569.532 5266020.406, 3578696.315...  
     """
     pm_tracts = geopandas.read_file(PUERTO_MADRYN_SHAPEFILE_PATH)
-    
     pm_tracts['toponimo_i'] = pm_tracts["toponimo_i"].astype('string')
-    pm_tracts = pm_tracts.rename(columns={'Unidades_7': 'nbi'})
-    
-    columns = ['toponimo_i', 'link', 'totalpobl', 'nbi', 'geometry']
+    columns = ['toponimo_i', 'totalpobl', 'geometry']
     pm_tracts = pm_tracts[columns]
-    
     pm_tracts.to_parquet(product, index=False)
 
 
