@@ -176,8 +176,6 @@ def get_cluster_figure(
     )
 
     # last tweaks
-    plt.xticks([])
-    plt.yticks([])
     ax.ticklabel_format(style='plain')
     ax.axis('off')
 

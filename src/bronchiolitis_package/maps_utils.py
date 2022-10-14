@@ -3,9 +3,15 @@ from shapely.geometry import Point
 import contextily
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import matplotlib.patheffects as PathEffects
+from matplotlib.lines import Line2D
+2
 
 
-def annotate_map(ax, shape_crs_string, PUERTO_MADRYN_BASEMAP_TIF_PATH, SOUTH_AMERICA_BASEMAP_TIF_PATH):
+def annotate_map(
+        ax, shape_crs_string,
+        PUERTO_MADRYN_BASEMAP_TIF_PATH=None,
+        SOUTH_AMERICA_BASEMAP_TIF_PATH=None
+    ):
     """ Agrega anotaciones al mapa:
         - Referencia de Puerto Madryn en América Latina
         - Flecha apuntando al norte
@@ -25,11 +31,12 @@ def annotate_map(ax, shape_crs_string, PUERTO_MADRYN_BASEMAP_TIF_PATH, SOUTH_AME
 
     # basemap:
     # crs=shape.crs.to_string()
-    contextily.add_basemap(
-        ax,
-        source=PUERTO_MADRYN_BASEMAP_TIF_PATH,
-        crs=shape_crs_string
-    )
+    if PUERTO_MADRYN_BASEMAP_TIF_PATH:
+        contextily.add_basemap(
+            ax,
+            source=PUERTO_MADRYN_BASEMAP_TIF_PATH,
+            crs=shape_crs_string
+        )
 
     # reference map_
     ref_ax = inset_axes(
@@ -46,11 +53,13 @@ def annotate_map(ax, shape_crs_string, PUERTO_MADRYN_BASEMAP_TIF_PATH, SOUTH_AME
     # puntito de madryn en sudamerica
     geopoint_madryn.plot(color='r', markersize=100, ax=ref_ax)
 
-    contextily.add_basemap(
-        ref_ax,
-        source=SOUTH_AMERICA_BASEMAP_TIF_PATH,
-        crs=south_america.crs.to_string()
-    )
+    if SOUTH_AMERICA_BASEMAP_TIF_PATH:
+        contextily.add_basemap(
+            ref_ax,
+            source=SOUTH_AMERICA_BASEMAP_TIF_PATH,
+            crs=south_america.crs.to_string()
+        )
+
     txt1 = ref_ax.text(
         x=geopoint_madryn.x,
         y=geopoint_madryn.y+(geopoint_madryn.y*0.15),
@@ -73,5 +82,40 @@ def annotate_map(ax, shape_crs_string, PUERTO_MADRYN_BASEMAP_TIF_PATH, SOUTH_AME
         head_length=400,
         overhang=.1
     )
-    
+    ref_ax.set_xticks([])
+    ref_ax.set_yticks([])
     return ax
+
+
+def add_points_to_ax(point_gdf, ax, point_plot_args={}, label_title="Admissions"):
+    """ Añade al mapa de clusters los puntos con los casos de bronquiolitis
+
+    Args:
+        point_plot_args (dict):
+            Atributos:
+                - "marker": 'o',
+                - "color": 'r',
+                - "alpha": 0.25,
+                - "markersize": 50
+        
+    """
+    
+    point_gdf.plot(
+        ax=ax,
+        **point_plot_args
+    )
+    
+    pmarks = []
+    # agregar la leyenda de admisiones y readmisiones
+    pmarks.append(
+        Line2D([0], [0],
+               marker=point_plot_args['marker'],
+               color='none',
+               label=f'{label_title} ({len(point_gdf)})',
+               markerfacecolor=point_plot_args['color'],
+               markersize=6,
+               alpha=point_plot_args['alpha'])
+    )
+
+    return ax, pmarks
+

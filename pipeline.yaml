@@ -37,6 +37,13 @@ tasks:
       cluster_labels: _products/spatial/cluster_labels_bv.parquet
       moranplot: _products/spatial/moranplot_bv.png
 
+  #
+  - source: tasks.nbi_map.get_nbi_clusters
+    product: _products/nbi/nbi_clusters.parquet
+
+  - source: tasks.nbi_map.get_nbi_map
+    product: _products/nbi/nbi_map.png
+
   # Figures:
   - source: tasks.clustermap.get_cluster_figure
     name: clustermap_figure
