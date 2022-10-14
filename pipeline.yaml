@@ -2,23 +2,23 @@ tasks:
   # Process:
   - source: tasks.raw.get_bronchiolitis_locations
     params:
-      MEDICAL_RECORDS_CSV_PATH: '{{bronchiolitis_cases_file_path}}' 
-      ADRESSES_AND_LATLONG_CSV_PATH: '{{adresses_file_path}}' 
+      MEDICAL_RECORDS_CSV_PATH: '{{root_path}}{{bronchiolitis_cases_file_path}}' 
+      ADRESSES_AND_LATLONG_CSV_PATH: '{{root_path}}{{adresses_file_path}}' 
     product: _products/raw/bronchiolitis_points.parquet
 
   - source: tasks.raw.get_shape
     params:
-      PUERTO_MADRYN_SHAPEFILE_PATH: '{{puerto_madryn_shapefile}}' 
+      PUERTO_MADRYN_SHAPEFILE_PATH: '{{root_path}}{{puerto_madryn_shapefile}}' 
     product: _products/raw/pm_shape.parquet
 
   - source: tasks.raw.get_nbi
     params:
-      PUERTO_MADRYN_SHAPEFILE_PATH: '{{puerto_madryn_shapefile}}' 
+      PUERTO_MADRYN_SHAPEFILE_PATH: '{{root_path}}{{puerto_madryn_shapefile}}' 
     product: _products/raw/nbi.parquet
 
   - source: tasks.cases.get_cases_for_each_circuit
     params:
-      PUERTO_MADRYN_SHAPEFILE_PATH: '{{puerto_madryn_shapefile}}' 
+      PUERTO_MADRYN_SHAPEFILE_PATH: '{{root_path}}{{puerto_madryn_shapefile}}' 
     product: _products/cases/bronchiolitis_and_tracts.parquet
 
   - source: tasks.spatial.get_moranplot
@@ -48,8 +48,8 @@ tasks:
   - source: tasks.clustermap.get_cluster_figure
     name: clustermap_figure
     params:
-      PUERTO_MADRYN_BASEMAP_TIF_PATH: '{{puerto_madryn_basemap_file}}' 
-      SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{south_america_basemap_file}}'
+      PUERTO_MADRYN_BASEMAP_TIF_PATH: '{{root_path}}{{puerto_madryn_basemap_file}}' 
+      SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{root_path}}{{south_america_basemap_file}}'
       LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
       PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP: '{{paint_bronchiolitis_locations_in_map}}'
     product: _products/cluster/cluster_map.png
@@ -57,8 +57,8 @@ tasks:
   - source: tasks.clustermap.get_cluster_figure_bv
     name: clustermap_figure_bv
     params:
-      PUERTO_MADRYN_BASEMAP_TIF_PATH: '{{puerto_madryn_basemap_file}}' 
-      SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{south_america_basemap_file}}' 
+      PUERTO_MADRYN_BASEMAP_TIF_PATH: '{{root_path}}{{puerto_madryn_basemap_file}}' 
+      SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{root_path}}{{south_america_basemap_file}}' 
       LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
       PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP: '{{paint_bronchiolitis_locations_in_map}}'      
     product: _products/cluster/cluster_bv_map.png
