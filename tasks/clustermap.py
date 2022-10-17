@@ -157,16 +157,23 @@ def get_cluster_figure(
     )
     
     # admission and readmissions points
-    pmarks_points = []
+    pmarks_admission_points = []
     if PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP:
         bronchiolitis_points_gdf = geopandas.read_parquet(upstream['get_bronchiolitis_locations'])
         bronchiolitis_points_gdf = bronchiolitis_points_gdf.to_crs(shape.crs.to_string())
         admissions_gdf = bronchiolitis_points_gdf[~bronchiolitis_points_gdf.es_reinternacion]
         readmissions_gdf = bronchiolitis_points_gdf[bronchiolitis_points_gdf.es_reinternacion]
-        ax, pmarks_points = __add_admission_points(admissions_gdf, readmissions_gdf, ax)
+        point_plot_args = {
+            "marker": 'o',
+            "color": 'k',
+            "alpha": 0.6,
+            "markersize": 15
+        }
+        ax, pmarks_admission_points = maps_utils.add_points_to_ax(
+            admissions_gdf, ax, point_plot_args, label_title="Admissions")
 
     # legend
-    pmarks = [*pmarks_map, *pmarks_points]
+    pmarks = [*pmarks_map, *pmarks_admission_points]
     handles, _ = ax.get_legend_handles_labels()
     ax.legend(
         title='References:',

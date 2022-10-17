@@ -87,7 +87,7 @@ def __get_colors_for_labels(labels, color_by_labels):
     return [color_by_labels[label_key] for label_key in actual_labels]
 
 
-def get_moranplot(upstream, product, LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAME_DICT):
+def get_moranplot(upstream, product, LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAME_DICT, KNN_VALUE):
     """ Ejecuta el analisis espacial y guarda dos salidas:
         - etiquetas de cluster para cada circuito electoral y
         - el moranplot + distribución de referencia. 
@@ -96,6 +96,17 @@ def get_moranplot(upstream, product, LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAM
     
     Se ejecutan las tareas rate y bivariada para agregar las columnas `label`y `label_bv`
     al mismo dataset de salida -> evaluar si esto es óptimo.
+
+    Args:
+        get_cases_for_each_circuit:
+            Data columns (total 5 columns):
+             #   Column      Non-Null Count  Dtype   
+            ---  ------      --------------  -----   
+             0   toponimo_i  86 non-null     string  
+             1   casos       86 non-null     int64   
+             2   totalpobl   86 non-null     float64 
+             3   tasa_casos  86 non-null     float64 
+             4   geometry    86 non-null     geometry
     
     Returns:
     
@@ -106,19 +117,19 @@ def get_moranplot(upstream, product, LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAM
     """
     pm_tracts = geopandas.read_parquet(upstream["get_cases_for_each_circuit"])
     
+    spatial_attrs = {
+        'attribute': 'tasa_casos',
+        'strategy': 'knn',
+        'k_neighbours': KNN_VALUE,
+        'use_moran_rate': True,
+        'moran_rate_column': 'totalpobl'
+    }
     # Pesos y geodataframes de trabajo
-    weights, moran_rate, lisa_rate = \
-        spatial.get_spatials(
-            pm_tracts,
-            attribute='casos',
-            strategy='knn',
-            k_neighbours=6,
-            use_moran_rate=True,
-            moran_rate_column='totalpobl'
-        )
+    weights, moran, lisa = spatial.get_spatials(pm_tracts, **spatial_attrs)
 
     # contar las cantidades por cada cluster
-    quadfilter = (lisa_rate.p_sim <= (.05)) * (lisa_rate.q)
+    MIN_SIGNIFICANCE_LEVEL = .05
+    quadfilter = (lisa.p_sim <= (MIN_SIGNIFICANCE_LEVEL)) * (lisa.q)
     labels = [LABEL_BY_QUADFILTER_DICT[str(i)] for i in quadfilter]
 
     # add label column
@@ -141,7 +152,7 @@ def get_moranplot(upstream, product, LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAM
         {'text': "LL", 'x_pos': -1.25, 'y_pos': -1.25},
     ]
     _get_moran_plot(
-        moran_rate, lisa_rate, str(product['moranplot']),
+        moran, lisa, str(product['moranplot']),
         xlabel='Bronchiolitis case rate',
         ylabel='Spatial lag: Bronchiolitis case rate',
         label_colors=label_colors,
@@ -149,8 +160,7 @@ def get_moranplot(upstream, product, LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAM
     )
 
 
-
-def get_moranplot_bv(upstream, product, LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAME_DICT):
+def get_moranplot_bv(upstream, product, LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAME_DICT, KNN_VALUE):
     """
     """
     pm_tracts = geopandas.read_parquet(upstream["get_cases_for_each_circuit"])
@@ -162,20 +172,18 @@ def get_moranplot_bv(upstream, product, LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABEL
         nbi_df,
         on='toponimo_i')
 
-    ####
+    spatial_attrs = {
+        'attribute': 'nbi',
+        'strategy': 'knn',
+        'k_neighbours': KNN_VALUE,
+        'use_moran_bv': True,
+        'moran_bv_column': 'tasa_casos'
+    }
     # bivariate analysis:
-    weights_bv, moran_bv, lisa_bv = \
-        spatial.get_spatials(
-            pm_tracts,
-            attribute='nbi',
-            strategy='knn',
-            k_neighbours=6,
-            use_moran_bv=True,
-            moran_bv_column='tasa_casos'
-        )
-    
+    weights, moran, lisa = spatial.get_spatials(pm_tracts, **spatial_attrs)
+
     # contar las cantidades por cada cluster
-    quadfilter_bv = (lisa_bv.p_sim <= (.05)) * (lisa_bv.q)
+    quadfilter_bv = (lisa.p_sim <= (.05)) * (lisa.q)
     labels_bv = [LABEL_BY_QUADFILTER_DICT[str(i)] for i in quadfilter_bv]
     # add label column:
     pm_tracts['label'] = labels_bv
@@ -195,13 +203,13 @@ def get_moranplot_bv(upstream, product, LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABEL
     ]
     label_colors_bv = __get_colors_for_labels(labels_bv, COLOR_BY_LABELNAME_DICT)
     _get_moran_plot(
-        moran_bv, lisa_bv,
+        moran, lisa,
         str(product['moranplot']),
         xlabel='UBN',
         ylabel='Spatial lag: Bronchiolitis case rate',
         label_colors=label_colors_bv,
         use_plot_moran_bv=True,
         annotations=annotations_bv
-    )    
+    )
 
 

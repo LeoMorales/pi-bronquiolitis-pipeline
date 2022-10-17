@@ -25,6 +25,7 @@ tasks:
     params:
       LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
       COLOR_BY_LABELNAME_DICT: '{{color_by_labelname}}'
+      KNN_VALUE: '{{knn_k}}'
     product:
       cluster_labels: _products/spatial/cluster_labels.parquet
       moranplot: _products/spatial/moranplot.png
@@ -33,6 +34,7 @@ tasks:
     params:
       LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
       COLOR_BY_LABELNAME_DICT: '{{color_by_labelname}}'
+      KNN_VALUE: '{{knn_k}}'
     product:
       cluster_labels: _products/spatial/cluster_labels_bv.parquet
       moranplot: _products/spatial/moranplot_bv.png
@@ -65,4 +67,6 @@ tasks:
 
   # Report:
   - source: tasks.report.create_report
+    params:
+      KNN_VALUE: '{{knn_k}}'
     product: _output/report.pdf
