@@ -64,7 +64,5 @@ tasks:
     product: _products/cluster/cluster_bv_map.png
 
   # Report:
-  - source: scripts/cluster_report.py
-    product:
-      nb: _output/cluster_report.ipynb
-      data: _output/cluster_report.pdf
+  - source: tasks.report.create_report
+    product: _output/report.pdf

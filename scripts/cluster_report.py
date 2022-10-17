@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+# + tags=[]
 # %load_ext autoreload
 # %autoreload 2
 
+# + tags=[]
 """
 Report con los resultados obtenidos
 """
@@ -11,10 +13,30 @@ import pdfkit
 # + tags=["parameters"]
 upstream = ['clustermap_figure', 'clustermap_figure_bv', 'get_moranplot', 'get_moranplot_bv']
 product = None
-# -
+# + tags=["injected-parameters"]
+# This cell was injected automatically based on your stated upstream dependencies (cell above) and pipeline.yaml preferences. It is temporary and will be removed when you save this notebook
+upstream = {
+    "get_moranplot": {
+        "cluster_labels": "/home/lmorales/work/pipelines/pi-bronquiolitis-pipeline/_products/spatial/cluster_labels.parquet",
+        "moranplot": "/home/lmorales/work/pipelines/pi-bronquiolitis-pipeline/_products/spatial/moranplot.png",
+    },
+    "get_moranplot_bv": {
+        "cluster_labels": "/home/lmorales/work/pipelines/pi-bronquiolitis-pipeline/_products/spatial/cluster_labels_bv.parquet",
+        "moranplot": "/home/lmorales/work/pipelines/pi-bronquiolitis-pipeline/_products/spatial/moranplot_bv.png",
+    },
+    "clustermap_figure_bv": "/home/lmorales/work/pipelines/pi-bronquiolitis-pipeline/_products/cluster/cluster_bv_map.png",
+    "clustermap_figure": "/home/lmorales/work/pipelines/pi-bronquiolitis-pipeline/_products/cluster/cluster_map.png",
+}
+product = {
+    "nb": "/home/lmorales/work/pipelines/pi-bronquiolitis-pipeline/_output/cluster_report.ipynb",
+    "data": "/home/lmorales/work/pipelines/pi-bronquiolitis-pipeline/_output/cluster_report.pdf",
+}
+
+
+# + [markdown] tags=[]
 # # Reporte
 
-# +
+# + tags=[]
 # HTML template to add our data and plots
 figure_clusters_path = str(upstream['clustermap_figure'])
 figure_clusters_bv_path = str(upstream['clustermap_figure_bv'])
@@ -62,9 +84,9 @@ report_template = f'''
       </figure>
   </html>
 '''
-# -
 
 
+# + tags=[]
 # Save HTML string to file
 HTML_REPORT_DIR = "tmp_report.html"
 with open(HTML_REPORT_DIR, "w") as r:
