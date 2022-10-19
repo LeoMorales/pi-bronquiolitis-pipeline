@@ -18,5 +18,6 @@ _products/
 # cache files
 */__pycache__/*
 *.pyc
+src/bronchiolitis_package.egg-info/*
 
 input-data/

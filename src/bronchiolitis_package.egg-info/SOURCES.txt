@@ -1,8 +1,0 @@
-setup.py
-src/bronchiolitis_package/__init__.py
-src/bronchiolitis_package/maps_utils.py
-src/bronchiolitis_package/spatial.py
-src/bronchiolitis_package.egg-info/PKG-INFO
-src/bronchiolitis_package.egg-info/SOURCES.txt
-src/bronchiolitis_package.egg-info/dependency_links.txt
-src/bronchiolitis_package.egg-info/top_level.txt

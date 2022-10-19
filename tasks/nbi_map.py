@@ -7,8 +7,8 @@ from matplotlib.patches import Patch
 import contextily as ctx
 
 from bronchiolitis_package import maps_utils
-puerto_madryn_basemap_file = "/home/lmorales/work/pipelines/pi-bronquiolitis-pipeline/input-data/basemaps_images/puerto_madryn.tif"
-south_america_basemap_file = '/home/lmorales/work/pipelines/pi-bronquiolitis-pipeline/input-data/basemaps_images/south_america_stamen_terrain_background.tif'
+puerto_madryn_basemap_file = "/home/lmorales/work/pipelines/pi-bronquiolitis/input-data/basemaps_images/puerto_madryn.tif"
+south_america_basemap_file = '/home/lmorales/work/pipelines/pi-bronquiolitis/input-data/basemaps_images/south_america_stamen_terrain_background.tif'
 
 
 # + tags=[]
