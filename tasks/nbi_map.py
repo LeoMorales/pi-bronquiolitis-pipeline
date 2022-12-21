@@ -105,6 +105,16 @@ def get_nbi_map(upstream, product):
     admissions_gdf = bronchiolitis_points_gdf[~bronchiolitis_points_gdf.es_reinternacion]
     readmissions_gdf = bronchiolitis_points_gdf[bronchiolitis_points_gdf.es_reinternacion]
     
+
+    point_plot_args = {
+        "marker": '^',
+        "color": 'cyan', 
+        "alpha": 0.9,
+        "markersize": 95
+    }
+    ax, pmarks_readmission_points = maps_utils.add_points_to_ax(
+        readmissions_gdf, ax, point_plot_args, label_title="Readmissions")
+
     point_plot_args = {
         "marker": 'o',
         "color": 'k',
@@ -113,15 +123,6 @@ def get_nbi_map(upstream, product):
     }
     ax, pmarks_admission_points = maps_utils.add_points_to_ax(
         admissions_gdf, ax, point_plot_args, label_title="Admissions")
-
-    point_plot_args = {
-        "marker": 'o',
-        "color": '#3f007d',  # purple
-        "alpha": 0.5,
-        "markersize": 50
-    }
-    ax, pmarks_readmission_points = maps_utils.add_points_to_ax(
-        readmissions_gdf, ax, point_plot_args, label_title="Readmissions")
 
     pmarks = [*pmarks, *pmarks_admission_points, *pmarks_readmission_points]
     handles, _ = ax.get_legend_handles_labels()

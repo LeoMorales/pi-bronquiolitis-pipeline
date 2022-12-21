@@ -3,7 +3,11 @@ import pandas
 import geopandas
 
 
-def get_bronchiolitis_locations(product, MEDICAL_RECORDS_CSV_PATH, ADRESSES_AND_LATLONG_CSV_PATH):
+def get_bronchiolitis_locations(
+        product,
+        ENV_MEDICAL_RECORDS_CSV_PATH,
+        ENV_ADRESSES_AND_LATLONG_CSV_PATH
+    ):
     """
     Tarea que combina los datos crudos de casos de bronquiolitis con el dataset de domicilios.
     El dataset crudo tiene las siguientes columnas:
@@ -41,7 +45,7 @@ def get_bronchiolitis_locations(product, MEDICAL_RECORDS_CSV_PATH, ADRESSES_AND_
         2             False -42.786004 -65.071097  POINT (-65.07110 -42.78600) 
     """
     # A: Historias clínicas
-    df_raw = pandas.read_csv(MEDICAL_RECORDS_CSV_PATH)
+    df_raw = pandas.read_csv(ENV_MEDICAL_RECORDS_CSV_PATH)
 
     df_cols = ['HC', 'INGRESO', 'EGRESO', 'SE', 'Edad', 'Domicilio definitivo']
     df = df_raw[df_cols]
@@ -51,14 +55,14 @@ def get_bronchiolitis_locations(product, MEDICAL_RECORDS_CSV_PATH, ADRESSES_AND_
     ## primero ordenamos por fecha de ingreso
     df = df.sort_values(by='INGRESO')
     ## después de ordenar, si se repite el nro de historia clinica, es reinternación:
-    df['es_reinternacion'] = df.HC.duplicated()
+    df['es_reinternacion'] = df['HC'].duplicated()
     df.columns = df.columns.str.lower().str.replace(' ', '_')
 
     df = df.reset_index(drop=True)
 
     #
     # B: Latlong de los domicilios
-    domicilio_latlong = pandas.read_csv(ADRESSES_AND_LATLONG_CSV_PATH)
+    domicilio_latlong = pandas.read_csv(ENV_ADRESSES_AND_LATLONG_CSV_PATH)
 
     ## rename columns (lowercase):
     domicilio_latlong = domicilio_latlong.rename(
@@ -79,6 +83,17 @@ def get_bronchiolitis_locations(product, MEDICAL_RECORDS_CSV_PATH, ADRESSES_AND_
     domicilio_latlong = domicilio_latlong.drop_duplicates()
     domicilio_latlong = domicilio_latlong.reset_index(drop=True)
 
+    df.loc[df['domicilio_definitivo'] == "Tecka 2050", "domicilio_definitivo"] = "Simón de Alcazabar 440"
+    df.loc[df['domicilio_definitivo'] == "Gualjaina 1410", "domicilio_definitivo"] = "Río Mayo 1510"
+    df.loc[df['domicilio_definitivo'] == "Lago Puelo 1476", "domicilio_definitivo"] = "Rada Tilly 1280"
+    df.loc[df['domicilio_definitivo'] == "Vittorio Martinelli 1230", "domicilio_definitivo"] = "Manuel Castro 1230"
+    df.loc[df['domicilio_definitivo'] == "Luis María Campos 450", "domicilio_definitivo"] = "Héroes de Malvinas 850"
+    df.loc\
+        [df['domicilio_definitivo'] == "Ruperto Gimenez 720", "domicilio_definitivo"] = \
+            "Esteban Williams 812"
+    df.loc\
+        [df['domicilio_definitivo'] == "Rio Pico 1710", "domicilio_definitivo"] = \
+            "Trevellin 1510"
     #
     # C: Combine
     output_df = pandas.merge(
@@ -86,7 +101,7 @@ def get_bronchiolitis_locations(product, MEDICAL_RECORDS_CSV_PATH, ADRESSES_AND_
         domicilio_latlong,
         on='domicilio_definitivo',
     )
-    
+
     #
     # D: Create geodataframe:
     output_gdf = geopandas.GeoDataFrame(

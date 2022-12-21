@@ -117,12 +117,17 @@ def get_moranplot(upstream, product, LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAM
     """
     pm_tracts = geopandas.read_parquet(upstream["get_cases_for_each_circuit"])
     
+    #spatial_attrs = {
+    #    'attribute': 'tasa_casos',
+    #    'strategy': 'knn',
+    #    'k_neighbours': KNN_VALUE,
+    #    'use_moran_rate': True,
+    #    'moran_rate_column': 'totalpobl'
+    #}
     spatial_attrs = {
         'attribute': 'tasa_casos',
         'strategy': 'knn',
         'k_neighbours': KNN_VALUE,
-        'use_moran_rate': True,
-        'moran_rate_column': 'totalpobl'
     }
     # Pesos y geodataframes de trabajo
     weights, moran, lisa = spatial.get_spatials(pm_tracts, **spatial_attrs)

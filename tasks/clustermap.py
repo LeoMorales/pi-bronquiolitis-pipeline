@@ -131,7 +131,8 @@ def get_cluster_figure(
         PUERTO_MADRYN_BASEMAP_TIF_PATH,
         SOUTH_AMERICA_BASEMAP_TIF_PATH,
         LABEL_BY_QUADFILTER_DICT,
-        PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP
+        PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP,
+        DIFFERENTIATE_ADMISSIONS_AND_READMISSIONS
     ):
     ''' Genera la figura de HS, CS, y outliers + puntos de domicilios de las internaciones.
     
@@ -161,16 +162,56 @@ def get_cluster_figure(
     if PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP:
         bronchiolitis_points_gdf = geopandas.read_parquet(upstream['get_bronchiolitis_locations'])
         bronchiolitis_points_gdf = bronchiolitis_points_gdf.to_crs(shape.crs.to_string())
-        admissions_gdf = bronchiolitis_points_gdf[~bronchiolitis_points_gdf.es_reinternacion]
-        readmissions_gdf = bronchiolitis_points_gdf[bronchiolitis_points_gdf.es_reinternacion]
         point_plot_args = {
             "marker": 'o',
             "color": 'k',
             "alpha": 0.6,
             "markersize": 15
         }
-        ax, pmarks_admission_points = maps_utils.add_points_to_ax(
-            admissions_gdf, ax, point_plot_args, label_title="Admissions")
+
+        if DIFFERENTIATE_ADMISSIONS_AND_READMISSIONS:
+            admissions_gdf = bronchiolitis_points_gdf[~bronchiolitis_points_gdf.es_reinternacion]
+            readmissions_gdf = bronchiolitis_points_gdf[bronchiolitis_points_gdf.es_reinternacion]
+            ax, pmarks_admission_points = maps_utils.add_points_to_ax(
+                admissions_gdf, ax, point_plot_args, label_title="Cases")
+        else:
+            ax, pmarks_admission_points = maps_utils.add_points_to_ax(
+                bronchiolitis_points_gdf,
+                ax,
+                point_plot_args,
+                label_title="Cases")
+            
+            highlighted_cases = bronchiolitis_points_gdf[bronchiolitis_points_gdf['hc'].isin(['144586', '144874', '145769', '143367'])]
+            
+            # Cajitas de nombres de los departamentos:
+            props = dict(
+                boxstyle='round',
+                alpha=.4
+            )
+
+            for point in highlighted_cases.iterrows():
+                ax.text(
+                    point[1]['geometry'].centroid.x,
+                    point[1]['geometry'].centroid.y,
+                    f"{point[1]['hc']} - {point[1]['edad']}",
+                    horizontalalignment='left',
+                    fontsize=9,
+                    bbox=props
+                )
+
+            point_plot_args = {
+                "marker": 'o',
+                "color": 'limegreen',
+                "alpha": 0.9,
+                "markersize": 19
+            }
+
+             
+            ax, pmarks_admission_points = maps_utils.add_points_to_ax(
+                highlighted_cases,
+                ax,
+                point_plot_args,
+                label_title="A veeeeer")
 
     # legend
     pmarks = [*pmarks_map, *pmarks_admission_points]

@@ -1,20 +1,20 @@
 tasks:
   # Process:
-  - source: tasks.raw.get_bronchiolitis_locations
+  - source: tasks.get.get_bronchiolitis_locations
     params:
-      MEDICAL_RECORDS_CSV_PATH: '{{root_path}}{{bronchiolitis_cases_file_path}}' 
-      ADRESSES_AND_LATLONG_CSV_PATH: '{{root_path}}{{adresses_file_path}}' 
-    product: _products/raw/bronchiolitis_points.parquet
+      ENV_MEDICAL_RECORDS_CSV_PATH: '{{root_path}}{{bronchiolitis_cases_file_path}}' 
+      ENV_ADRESSES_AND_LATLONG_CSV_PATH: '{{root_path}}{{adresses_file_path}}' 
+    product: _products/get/bronchiolitis_points.parquet
 
-  - source: tasks.raw.get_shape
+  - source: tasks.get.get_shape
     params:
       PUERTO_MADRYN_SHAPEFILE_PATH: '{{root_path}}{{puerto_madryn_shapefile}}' 
-    product: _products/raw/pm_shape.parquet
+    product: _products/get/pm_shape.parquet
 
-  - source: tasks.raw.get_nbi
+  - source: tasks.get.get_nbi
     params:
       PUERTO_MADRYN_SHAPEFILE_PATH: '{{root_path}}{{puerto_madryn_shapefile}}' 
-    product: _products/raw/nbi.parquet
+    product: _products/get/nbi.parquet
 
   - source: tasks.cases.get_cases_for_each_circuit
     params:
@@ -54,6 +54,7 @@ tasks:
       SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{root_path}}{{south_america_basemap_file}}'
       LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
       PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP: '{{paint_bronchiolitis_locations_in_map}}'
+      DIFFERENTIATE_ADMISSIONS_AND_READMISSIONS: '{{differentiate_admissions_and_readmissions}}'
     product: _products/cluster/cluster_map.png
 
   - source: tasks.clustermap.get_cluster_figure_bv
