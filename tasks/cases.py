@@ -2,7 +2,7 @@
 import pandas
 import geopandas
 
-def get_cases_for_each_circuit(upstream, product, PUERTO_MADRYN_SHAPEFILE_PATH):
+def get_cases_for_each_circuit(upstream, product):
     """
     Obtiene los casos de bronquiolitis (mas la tasa según la población) para cada
     polígono de radio censal.

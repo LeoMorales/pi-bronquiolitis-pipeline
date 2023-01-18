@@ -36,11 +36,11 @@ def create_report(product, upstream, KNN_VALUE):
     '''
     report.add_section(
         html_section,
-        figure=str(upstream['get_moranplot']['moranplot'])
+        figure=str(upstream['get_moranplot'])
     )
     report.add_section(
         '',
-        figure=str(upstream['clustermap_figure'])
+        figure=str(upstream['clustermap-figure'])
     )
     
     # add bivariate output
@@ -54,7 +54,7 @@ def create_report(product, upstream, KNN_VALUE):
     )
     report.add_section(
         '',
-        figure=str(upstream['clustermap_figure_bv'])
+        figure=str(upstream['clustermap-figure-bivariate'])
     )
 
     # save:

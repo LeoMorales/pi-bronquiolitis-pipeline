@@ -4,7 +4,9 @@ import contextily
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import matplotlib.patheffects as PathEffects
 from matplotlib.lines import Line2D
-2
+import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
+
 
 
 def annotate_map(
@@ -119,3 +121,35 @@ def add_points_to_ax(point_gdf, ax, point_plot_args={}, label_title="Admissions"
 
     return ax, pmarks
 
+def plot_puerto_madryn_tract_map(
+        shape,
+        paint_by_column,
+        tracts_palette,
+        edge_palette
+    ):
+    """ Dibuja el mapa de cluster pintado según la etiqueta de cluster """
+    # Set up figure and axes
+    f, ax = plt.subplots(figsize=(12, 12))
+
+    pmarks = []
+    for ctype, tracts in shape.groupby(paint_by_column):
+        # Define the color for each group using the dictionary
+        color = tracts_palette[ctype]
+        
+        edge_color = edge_palette[ctype]
+        
+        # Plot each group using the color defined above
+        tracts.plot(
+            color=color,
+            ax=ax,
+            label=ctype,
+            edgecolor=edge_color
+        )
+
+        pmarks.append(Patch(
+            facecolor=color,
+            label="{} ({})".format(ctype, len(tracts))))
+
+    figure_title="Moran Statistics: Cases of bronchiolitis\nPuerto Madryn, Chubut, Argentina"
+    ax.set(title=figure_title)
+    return ax, pmarks

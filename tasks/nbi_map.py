@@ -127,13 +127,13 @@ def get_nbi_map(upstream, product):
     pmarks = [*pmarks, *pmarks_admission_points, *pmarks_readmission_points]
     handles, _ = ax.get_legend_handles_labels()
     ax.legend(
-        title='Census Radios NBI 3 (2010)',
+        title='Census Radios UBN 3 (2010)',
         handles=[*handles,*pmarks],
         loc='upper right',
         prop={'size': 12}
     )
     title = 'Distribution of bronchiolitis cases (2017) on census radios'
-    title += '\naccording to NBI 3 Overcrowding (2010) (in total %)'
+    title += '\naccording to UBN 3 Overcrowding (2010) (in total %)'
     ax.set_title(title, fontsize=18)
     ax.axis('off')
     

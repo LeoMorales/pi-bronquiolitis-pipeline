@@ -83,6 +83,7 @@ def get_bronchiolitis_locations(
     domicilio_latlong = domicilio_latlong.drop_duplicates()
     domicilio_latlong = domicilio_latlong.reset_index(drop=True)
 
+    # mudanza problems:
     df.loc[df['domicilio_definitivo'] == "Tecka 2050", "domicilio_definitivo"] = "Simón de Alcazabar 440"
     df.loc[df['domicilio_definitivo'] == "Gualjaina 1410", "domicilio_definitivo"] = "Río Mayo 1510"
     df.loc[df['domicilio_definitivo'] == "Lago Puelo 1476", "domicilio_definitivo"] = "Rada Tilly 1280"
@@ -94,7 +95,25 @@ def get_bronchiolitis_locations(
     df.loc\
         [df['domicilio_definitivo'] == "Rio Pico 1710", "domicilio_definitivo"] = \
             "Trevellin 1510"
-    #
+
+    # not found problems:
+    df.loc\
+        [df['domicilio_definitivo'] == "M.A. Zar 1431", "domicilio_definitivo"] = \
+            "Marcos A. Zar 1431"
+    df.loc\
+        [df['domicilio_definitivo'] == "Manuel Alzúa 620", "domicilio_definitivo"] = \
+            "Manuel Alsua 620"
+    # hay dos Alzúa...
+    df.loc\
+        [df['domicilio_definitivo'] == "C.T. Alt 213", "domicilio_definitivo"] = \
+            "Alt 213"
+    df.loc\
+        [df['domicilio_definitivo'] == "Italia 125", "domicilio_definitivo"] = \
+            "Italia 1000"
+    df.loc\
+        [df['domicilio_definitivo'] == "E. Williams 995", "domicilio_definitivo"] = \
+            "Esteban Williams 995" 
+
     # C: Combine
     output_df = pandas.merge(
         df,

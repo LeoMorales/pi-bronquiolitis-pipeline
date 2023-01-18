@@ -17,29 +17,56 @@ tasks:
     product: _products/get/nbi.parquet
 
   - source: tasks.cases.get_cases_for_each_circuit
-    params:
-      PUERTO_MADRYN_SHAPEFILE_PATH: '{{root_path}}{{puerto_madryn_shapefile}}' 
+    name: cases-for-each-circuit
     product: _products/cases/bronchiolitis_and_tracts.parquet
 
-  - source: tasks.spatial.get_moranplot
+  - source: tasks.spatial.get_moran_and_lisa
+    name: get-moran-and-lisa
+    params:
+      KNN_VALUE: '{{knn_k}}'
+    product:
+      weights: _products/spatial/weights-pm-tracts.pickle
+      moran: _products/spatial/moran-pm-tracts.pickle
+      lisa: _products/spatial/lisa-pm-tracts.pickle
+
+  - source: tasks.spatial.get_moran_and_lisa_nbi_and_bronchiolitis
+    name: get-moran-and-lisa-bivariate
+    params:
+      KNN_VALUE: '{{knn_k}}'
+    product:
+      weights: _products/spatial/bivariate/weights-pm-tracts.pickle
+      moran: _products/spatial/bivariate/moran-pm-tracts.pickle
+      lisa: _products/spatial/bivariate/lisa-pm-tracts.pickle
+
+  - source: tasks.spatial.get_moran_and_lisa_bronchiolitis_and_nbi
+    name: get-moran-and-lisa-bivariate-reverse
+    params:
+      KNN_VALUE: '{{knn_k}}'
+    product:
+      weights: _products/spatial/bivariate-brq-vs-nbi/weights-pm-tracts.pickle
+      moran: _products/spatial/bivariate-brq-vs-nbi/moran-pm-tracts.pickle
+      lisa: _products/spatial/bivariate-brq-vs-nbi/lisa-pm-tracts.pickle
+
+  - source: tasks.spatial_vis.get_moranplot
     params:
       LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
       COLOR_BY_LABELNAME_DICT: '{{color_by_labelname}}'
-      KNN_VALUE: '{{knn_k}}'
-    product:
-      cluster_labels: _products/spatial/cluster_labels.parquet
-      moranplot: _products/spatial/moranplot.png
+    product: _products/spatial-vis/moranplot.png
 
-  - source: tasks.spatial.get_moranplot_bv
+  - source: tasks.spatial_vis.get_moranplot_bivariate_nbi_bronchiolitis
+    name: get-moranplot-bivariate
     params:
       LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
       COLOR_BY_LABELNAME_DICT: '{{color_by_labelname}}'
-      KNN_VALUE: '{{knn_k}}'
-    product:
-      cluster_labels: _products/spatial/cluster_labels_bv.parquet
-      moranplot: _products/spatial/moranplot_bv.png
+    product: _products/spatial-vis/moranplot-bivariate-nbi-bronchiolitis.png
 
-  #
+  - source: tasks.spatial_vis.get_moranplot_bivariate_bronchiolitis_nbi
+    name: get-moranplot-bivariate-reverse
+    params:
+      LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
+      COLOR_BY_LABELNAME_DICT: '{{color_by_labelname}}'
+    product: _products/spatial-vis/moranplot-bivariate-bronchiolitis-nbi.png
+
   - source: tasks.nbi_map.get_nbi_clusters
     product: _products/nbi/nbi_clusters.parquet
 
@@ -47,27 +74,38 @@ tasks:
     product: _products/nbi/nbi_map.png
 
   # Figures:
-  - source: tasks.clustermap.get_cluster_figure
-    name: clustermap_figure
+  - source: tasks.spatial_vis.create_clustermap_figure
+    name: clustermap-figure
     params:
       PUERTO_MADRYN_BASEMAP_TIF_PATH: '{{root_path}}{{puerto_madryn_basemap_file}}' 
       SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{root_path}}{{south_america_basemap_file}}'
       LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
       PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP: '{{paint_bronchiolitis_locations_in_map}}'
       DIFFERENTIATE_ADMISSIONS_AND_READMISSIONS: '{{differentiate_admissions_and_readmissions}}'
-    product: _products/cluster/cluster_map.png
+    product: _products/spatial-vis/cluster_map.png
 
-  - source: tasks.clustermap.get_cluster_figure_bv
-    name: clustermap_figure_bv
+  - source: tasks.spatial_vis.create_clustermap_figure_bivariate
+    name: clustermap-figure-bivariate
     params:
       PUERTO_MADRYN_BASEMAP_TIF_PATH: '{{root_path}}{{puerto_madryn_basemap_file}}' 
-      SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{root_path}}{{south_america_basemap_file}}' 
+      SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{root_path}}{{south_america_basemap_file}}'
       LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
-      PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP: '{{paint_bronchiolitis_locations_in_map}}'      
-    product: _products/cluster/cluster_bv_map.png
+      PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP: '{{paint_bronchiolitis_locations_in_map}}'
+      DIFFERENTIATE_ADMISSIONS_AND_READMISSIONS: '{{differentiate_admissions_and_readmissions}}'
+    product: _products/spatial-vis/cluster_map_bivariate_nbi_bronchiolitis.png
+
+  - source: tasks.spatial_vis.create_clustermap_figure_bivariate_brq_nbi
+    name: clustermap-figure-bivariate-brq-nbi
+    params:
+      PUERTO_MADRYN_BASEMAP_TIF_PATH: '{{root_path}}{{puerto_madryn_basemap_file}}' 
+      SOUTH_AMERICA_BASEMAP_TIF_PATH: '{{root_path}}{{south_america_basemap_file}}'
+      LABEL_BY_QUADFILTER_DICT: '{{label_by_quadfilter}}'
+      PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP: '{{paint_bronchiolitis_locations_in_map}}'
+      DIFFERENTIATE_ADMISSIONS_AND_READMISSIONS: '{{differentiate_admissions_and_readmissions}}'
+    product: _products/spatial-vis/cluster_map_bivariate_bronchiolitis_nbi.png
 
   # Report:
-  - source: tasks.report.create_report
-    params:
-      KNN_VALUE: '{{knn_k}}'
-    product: _output/report.pdf
+  # - source: tasks.report.create_report
+  #   params:
+  #     KNN_VALUE: '{{knn_k}}'
+  #   product: _output/report.pdf
