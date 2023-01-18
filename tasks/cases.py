@@ -56,8 +56,8 @@ def get_cases_for_each_circuit(upstream, product):
     
     # add rates:
     rates_gdf = output_gdf.assign(
-        tasa_casos=(output_gdf.casos / output_gdf.totalpobl) * 10_000
-    )  # TODO: es valida totalpobl?
+        tasa_casos=(output_gdf['casos'] / output_gdf{'totalpobl'}) * 10_000
+    )
 
     columns = ['toponimo_i', 'casos', 'totalpobl', 'tasa_casos', 'geometry']
     rates_gdf = rates_gdf[columns]

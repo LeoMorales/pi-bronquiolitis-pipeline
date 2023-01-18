@@ -7,8 +7,8 @@ from matplotlib.patches import Patch
 import contextily as ctx
 
 from bronchiolitis_package import maps_utils
-puerto_madryn_basemap_file = "/home/lmorales/work/pipelines/pi-bronquiolitis/input-data/basemaps_images/puerto_madryn.tif"
-south_america_basemap_file = '/home/lmorales/work/pipelines/pi-bronquiolitis/input-data/basemaps_images/south_america_stamen_terrain_background.tif'
+PUERTO_MADRYN_BASEMAP_FILE = "/home/lmorales/work/pipelines/pi-bronquiolitis/input-data/basemaps_images/puerto_madryn.tif"
+SOUTH_AMERICA_BASEMAP_FILE = '/home/lmorales/work/pipelines/pi-bronquiolitis/input-data/basemaps_images/south_america_stamen_terrain_background.tif'
 
 
 # + tags=[]
@@ -89,14 +89,14 @@ def get_nbi_map(upstream, product):
 
     ctx.add_basemap(
         ax,
-        source=puerto_madryn_basemap_file,
+        source=PUERTO_MADRYN_BASEMAP_FILE,
         crs=nbi_shape.crs.to_string()
     )
 
     ax = maps_utils.annotate_map(
         ax, nbi_shape.crs,
-        puerto_madryn_basemap_file,
-        south_america_basemap_file
+        PUERTO_MADRYN_BASEMAP_FILE,
+        SOUTH_AMERICA_BASEMAP_FILE
     )
     
     
@@ -143,6 +143,4 @@ def get_nbi_map(upstream, product):
         dpi=300
     )
     plt.close()
-
-
 
