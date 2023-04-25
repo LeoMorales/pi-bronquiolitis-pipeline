@@ -71,7 +71,7 @@ def get_moran_and_lisa(upstream, product, MORAN_ATTR, WEIGHT_STRATEGY, WEIGHT_PA
 #         pickle.dump(lisa, outfile)
 
 
-def get_moran_and_lisa_nbi_and_bronchiolitis(upstream, product, MORAN_ATTR, BIVARIATE_MORAN_ATTR, WEIGHT_STRATEGY, WEIGHT_PARAM):
+def get_moran_and_lisa_bivariate(upstream, product, MORAN_ATTR, BIVARIATE_MORAN_ATTR, WEIGHT_STRATEGY, WEIGHT_PARAM):
     # combine bronchiolitis and nbi data
     pm_tracts = geopandas.read_parquet(
         upstream["cases-for-each-circuit"])
@@ -102,7 +102,7 @@ def get_moran_and_lisa_nbi_and_bronchiolitis(upstream, product, MORAN_ATTR, BIVA
         pickle.dump(lisa, outfile)
 
 
-def get_moran_and_lisa_bronchiolitis_and_nbi(upstream, product, MORAN_ATTR, BIVARIATE_MORAN_ATTR, WEIGHT_STRATEGY, WEIGHT_PARAM):
+def get_moran_and_lisa_bivariate_reverse(upstream, product, MORAN_ATTR, BIVARIATE_MORAN_ATTR, WEIGHT_STRATEGY, WEIGHT_PARAM):
     # combine bronchiolitis and nbi data
     pm_tracts = geopandas.read_parquet(
         upstream["cases-for-each-circuit"])

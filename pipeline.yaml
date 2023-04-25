@@ -31,7 +31,7 @@ tasks:
       moran: _products/spatial/moran-pm-tracts.pickle
       lisa: _products/spatial/lisa-pm-tracts.pickle
 
-  - source: tasks.spatial.get_moran_and_lisa_nbi_and_bronchiolitis
+  - source: tasks.spatial.get_moran_and_lisa_bivariate
     name: get-moran-and-lisa-bivariate
     params:
       MORAN_ATTR: "{{moran_attr}}"
@@ -43,7 +43,7 @@ tasks:
       moran: _products/spatial/bivariate/moran-pm-tracts.pickle
       lisa: _products/spatial/bivariate/lisa-pm-tracts.pickle
 
-  - source: tasks.spatial.get_moran_and_lisa_bronchiolitis_and_nbi
+  - source: tasks.spatial.get_moran_and_lisa_bivariate_reverse
     name: get-moran-and-lisa-bivariate-reverse
     params:
       MORAN_ATTR: "{{bivariate_moran_attr}}"
