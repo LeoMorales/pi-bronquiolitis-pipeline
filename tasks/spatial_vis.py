@@ -109,14 +109,14 @@ def get_moranplot_bivariate_nbi_bronchiolitis(
 
 def get_moranplot_bivariate_bronchiolitis_nbi(
         upstream, product,
-        LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAME_DICT
+        LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAME_DICT,
     ):
     """ 
     Returns:
         - png: Moran Plot
     """
-    moran_pickle_path = str(upstream['get-moran-and-lisa-bivariate-reverse']['moran'])
-    lisa_pickle_path = str(upstream['get-moran-and-lisa-bivariate-reverse']['lisa'])
+    moran_pickle_path = str(upstream["get-moran-and-lisa-bivariate-reverse"]['moran'])
+    lisa_pickle_path = str(upstream["get-moran-and-lisa-bivariate-reverse"]['lisa'])
     with open(moran_pickle_path, "rb") as infile:
         moran = pickle.load(infile)
     with open(lisa_pickle_path, "rb") as infile:

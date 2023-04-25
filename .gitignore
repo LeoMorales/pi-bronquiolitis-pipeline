@@ -15,6 +15,9 @@ ipython_config.py
 _output/
 _products/
 
+# scripts
+scripts/
+
 # cache files
 */__pycache__/*
 *.pyc

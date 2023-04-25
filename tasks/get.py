@@ -150,8 +150,26 @@ def get_shape(product, PUERTO_MADRYN_SHAPEFILE_PATH):
     """
     pm_tracts = geopandas.read_file(PUERTO_MADRYN_SHAPEFILE_PATH)
     pm_tracts['toponimo_i'] = pm_tracts["toponimo_i"].astype('string')
-    columns = ['toponimo_i', 'totalpobl', 'geometry']
+    pm_tracts['link'] = pm_tracts["link"].astype('string')
+    columns = ['link', 'toponimo_i', 'totalpobl', 'geometry']
     pm_tracts = pm_tracts[columns]
+    
+    CSV_EDADES_CHUBUT = "/home/lmorales/work/pipelines/pi-bronquiolitis/input-data/edades_chubut_censo_2010_INDEC_solo_madryn.csv"
+    df_indec = pandas.read_csv(
+        CSV_EDADES_CHUBUT,
+        delimiter='\\t')
+    
+    df_indec = df_indec[df_indec['edad'] == 0]
+    df_indec[["link", "menores_de_un_año"]] = df_indec[["area", "casos"]]
+    df_indec["link"] = df_indec['link'].astype(str)
+
+    pm_tracts = pandas.merge(
+        pm_tracts,
+        df_indec,
+        on='link',
+        how='left'
+    )
+
     pm_tracts.to_parquet(product, index=False)
 
 

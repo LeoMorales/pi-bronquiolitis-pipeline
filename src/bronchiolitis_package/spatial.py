@@ -14,8 +14,7 @@ from collections import Counter
 def get_spatials(
         shape, attribute,
         strategy='knn',
-        k_neighbours=8,
-        band_distance=500,
+        strategy_args=8,
         use_moran_rate=False,
         moran_rate_column=None,
         use_moran_bv=False,
@@ -24,18 +23,17 @@ def get_spatials(
     """
     Retona weights, moran global y moran local.
     Args:
-    - strategy (str): Estrategia para obtener los pesos.
-        Valor en ['queen', 'rook', 'knn', 'distance_band']
-    - k_neighbours (int, default=8): Cantidad de vecinos a considerar.
-        Se tiene en cuenta solo si la estrategia es knn.
-    - band_distance (int, default=500): Cantidad de unidades de distancia para especificar el radio de la vecindad.
-        Se tiene en cuenta solo si la estrategia es distance_band.
-        Según la capa, se debe interpretar la unidad de medida (kms, millas, grados).
-    - use_moran_rate (bool, default=False): Indica si se debe considerar otra columa de la capa como columna de población
-    - moran_rate_column (None or str, default=None): 
-        Columna de población para calcular los I de Moran.
+        - strategy (str): Estrategia para obtener los pesos.
+            Valor en ['queen', 'rook', 'knn', 'distance_band']
+        - strategy_args (int, default=8): Cantidad de vecinos si la estrategia es knn, o 
+            cantidad de unidades de distancia para especificar el radio de la vecindad si
+            la estrategia es distance_band. Según la capa, se debe interpretar la unidad
+            de medida (kms, millas, grados).
+        - use_moran_rate (bool, default=False): Indica si se debe considerar otra columa de la capa como columna de población
+        - moran_rate_column (None or str, default=None): 
+            Columna de población para calcular los I de Moran.
 
-    Returns:
+        Returns:
     - w (pysal.lib.weights): Pesos según la capa recibida.
     - moran (esda.moran.Moran): Global Moran object.
     - lisa (esda.moran.Moran_Local): Local Moran object.
@@ -45,14 +43,7 @@ def get_spatials(
         'rook': lambda shape, attr: weights.contiguity.Rook.from_dataframe(shape),
         'knn': lambda shape, attr: weights.KNN.from_dataframe(shape, k=attr),
         'distance_band': lambda shape, attr: weights.DistanceBand.from_dataframe(shape, attr, silence_warnings=True)
-    }
-    # Create the spatial weights matrix
-    strategy_args = None
-    if strategy == 'knn':
-        strategy_args = k_neighbours
-    if strategy == 'distance_band':
-        strategy_args = band_distance
-    
+    }    
     w = weights_selection[strategy](shape, strategy_args)
     # Row standardize the matrix
     w.transform = 'R'

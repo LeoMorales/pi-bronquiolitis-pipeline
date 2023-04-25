@@ -21,7 +21,8 @@ def get_cases_for_each_circuit(upstream, product):
 
     # read shape:
     puerto_madryn_shp = geopandas.read_parquet(upstream['get_shape'])
-    
+    COL_YOUNG_POPULATION = 'menores_de_un_año'
+    COL_TOTAL_POPULATION = 'totalpobl'
     # use same crs:
     bronchiolitis_gdf = bronchiolitis_gdf.to_crs(puerto_madryn_shp.crs.to_string())
 
@@ -49,18 +50,24 @@ def get_cases_for_each_circuit(upstream, product):
     cases_df['toponimo_i'] = cases_df["toponimo_i"].astype('string')
     
     output_gdf = pandas.merge(
-        puerto_madryn_shp[['toponimo_i', 'totalpobl', 'geometry']],
+        puerto_madryn_shp[['link', 'toponimo_i', COL_TOTAL_POPULATION, COL_YOUNG_POPULATION, 'geometry']],
         cases_df,
         on='toponimo_i'
     )
     
     # add rates:
-    rates_gdf = output_gdf.assign(
-        tasa_casos=(output_gdf['casos'] / output_gdf{'totalpobl'}) * 10_000
-    )
+    output_gdf['tasa_casos'] = (output_gdf['casos'] / output_gdf[COL_TOTAL_POPULATION]) * 10_000
+    output_gdf['tasa_casos_menores'] = (output_gdf['casos'] / output_gdf[COL_YOUNG_POPULATION]) * 10_000
+    
 
-    columns = ['toponimo_i', 'casos', 'totalpobl', 'tasa_casos', 'geometry']
-    rates_gdf = rates_gdf[columns]
+    columns = [
+        'link', 'toponimo_i',
+        'casos',
+        COL_TOTAL_POPULATION, 'tasa_casos',
+        COL_YOUNG_POPULATION, 'tasa_casos_menores',
+        'geometry'
+    ]
+    output_gdf = output_gdf[columns]
     
     # save geodataframe
-    rates_gdf.to_parquet(str(product), index=False)
+    output_gdf.to_parquet(str(product), index=False)
