@@ -1,20 +1,10 @@
 # -*- coding: utf-8 -*-
 # +
-import pandas
 import geopandas
-from splot.esda import plot_moran, moran_scatterplot, plot_moran_bv
 import matplotlib.pyplot as plt
-from matplotlib import colors
-from collections import Counter
 import pickle
 from surnames_package import spatial_vis
-
-from matplotlib.patches import Patch
-from IPython.display import Image
-from collections import Counter
 from bronchiolitis_package import maps_utils
-from matplotlib.lines import Line2D
-
 from bronchiolitis_package import spatial_utils
 
 def __launch_moranplot_creation_task(
@@ -81,8 +71,10 @@ def get_moranplot(
     )
 
 
-def get_moranplot_bivariate_nbi_bronchiolitis(
+def get_moranplot_bivariate(
         upstream, product,
+        pMoranAttr,
+        pMoranLagAttr,
         LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAME_DICT
     ):
     """ 
@@ -103,12 +95,14 @@ def get_moranplot_bivariate_nbi_bronchiolitis(
         COLOR_BY_LABELNAME_DICT=COLOR_BY_LABELNAME_DICT,
         outputFilePath=str(product),
         useBivariate=True,
-        xLabel='UBN',
-        yLabel='Spatial lag of bronchiolitis case rate',
+        xLabel=f'{pMoranAttr}',
+        yLabel=f'Spatial lag of: {pMoranLagAttr}',
     )
 
-def get_moranplot_bivariate_bronchiolitis_nbi(
+def get_moranplot_bivariate_reverse(
         upstream, product,
+        pMoranAttr,
+        pMoranLagAttr,
         LABEL_BY_QUADFILTER_DICT, COLOR_BY_LABELNAME_DICT,
     ):
     """ 
@@ -129,11 +123,16 @@ def get_moranplot_bivariate_bronchiolitis_nbi(
         COLOR_BY_LABELNAME_DICT=COLOR_BY_LABELNAME_DICT,
         outputFilePath=str(product),
         useBivariate=True,
-        xLabel='bronchiolitis case rate',
-        yLabel='Spatial lag of UBN',
+        xLabel=f'{pMoranAttr}',
+        yLabel=f'Spatial lag of: {pMoranLagAttr}',
     )
 
-def __create_base_clustermap(aLisa, pm_tracts_shape, LABEL_BY_QUADFILTER_DICT):
+def __create_base_clustermap(
+        aLisa,
+        pm_tracts_shape,
+        LABEL_BY_QUADFILTER_DICT,
+        figure_title="Moran Statistics: Cases of bronchiolitis\nPuerto Madryn, Chubut, Argentina"
+    ):
     ''' Genera la figura de HS, CS, y outliers + puntos de domicilios de las internaciones.
     
     upstream = ['get_bronchiolitis', 'shape']
@@ -159,7 +158,8 @@ def __create_base_clustermap(aLisa, pm_tracts_shape, LABEL_BY_QUADFILTER_DICT):
         shape=pm_tracts_shape,
         paint_by_column="label",
         tracts_palette=tracts_palette,
-        edge_palette=edge_palette
+        edge_palette=edge_palette,
+        figure_title=figure_title
     )
     return ax, pmarks_map
 
@@ -240,7 +240,8 @@ def __launch_clustermap_creation_task(
         SOUTH_AMERICA_BASEMAP_TIF_PATH,
         LABEL_BY_QUADFILTER_DICT,
         PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP,
-        DIFFERENTIATE_ADMISSIONS_AND_READMISSIONS
+        DIFFERENTIATE_ADMISSIONS_AND_READMISSIONS,
+        figure_title="Moran Statistics: Cases of bronchiolitis\nPuerto Madryn, Chubut, Argentina"
     ):
     ''' Genera la figura de HS, CS, y outliers + puntos de domicilios de las internaciones.
     
@@ -250,15 +251,16 @@ def __launch_clustermap_creation_task(
     ax, pmarks_map = __create_base_clustermap(
         lisa,
         pm_tracts_shape,
-        LABEL_BY_QUADFILTER_DICT
+        LABEL_BY_QUADFILTER_DICT,
+        figure_title=figure_title
     )
         
     # 2. contextualize clustermap
     ax = maps_utils.annotate_map(
         ax,
-        pm_tracts_shape.crs.to_string(),
-        PUERTO_MADRYN_BASEMAP_TIF_PATH,
-        SOUTH_AMERICA_BASEMAP_TIF_PATH
+        shape_crs_string=pm_tracts_shape.crs.to_string(),
+        PUERTO_MADRYN_BASEMAP_TIF_PATH=PUERTO_MADRYN_BASEMAP_TIF_PATH,
+        SOUTH_AMERICA_BASEMAP_TIF_PATH=SOUTH_AMERICA_BASEMAP_TIF_PATH       
     )
 
     # 3. add cases points?
@@ -329,6 +331,8 @@ def create_clustermap_figure(
 
 def create_clustermap_figure_bivariate(
         product, upstream,
+        pMoranAttr,
+        pMoranLagAttr,
         PUERTO_MADRYN_BASEMAP_TIF_PATH,
         SOUTH_AMERICA_BASEMAP_TIF_PATH,
         LABEL_BY_QUADFILTER_DICT,
@@ -355,7 +359,8 @@ def create_clustermap_figure_bivariate(
         SOUTH_AMERICA_BASEMAP_TIF_PATH,
         LABEL_BY_QUADFILTER_DICT,
         PAINT_BRONCHIOLITIS_LOCATIONS_IN_MAP,
-        DIFFERENTIATE_ADMISSIONS_AND_READMISSIONS
+        DIFFERENTIATE_ADMISSIONS_AND_READMISSIONS,
+        figure_title=f"Bi-variate Moran Statistics: {pMoranAttr} and {pMoranLagAttr}\nPuerto Madryn, Chubut, Argentina"
     )
 
     plt.tight_layout()
@@ -366,7 +371,7 @@ def create_clustermap_figure_bivariate(
     plt.close()
 
 
-def create_clustermap_figure_bivariate_brq_nbi(
+def create_clustermap_figure_bivariate_reverse(
         product, upstream,
         PUERTO_MADRYN_BASEMAP_TIF_PATH,
         SOUTH_AMERICA_BASEMAP_TIF_PATH,

@@ -125,7 +125,8 @@ def plot_puerto_madryn_tract_map(
         shape,
         paint_by_column,
         tracts_palette,
-        edge_palette
+        edge_palette,
+        figure_title="Moran Statistics: Cases of bronchiolitis\nPuerto Madryn, Chubut, Argentina"
     ):
     """ Dibuja el mapa de cluster pintado según la etiqueta de cluster """
     # Set up figure and axes
@@ -150,6 +151,5 @@ def plot_puerto_madryn_tract_map(
             facecolor=color,
             label="{} ({})".format(ctype, len(tracts))))
 
-    figure_title="Moran Statistics: Cases of bronchiolitis\nPuerto Madryn, Chubut, Argentina"
     ax.set(title=figure_title)
     return ax, pmarks
