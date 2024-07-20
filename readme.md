@@ -7,6 +7,7 @@ Setup:
 Using ploomber pipelines:
 
 ```
+> ./install_packages.sh
 > ploomber build
 ```
 
